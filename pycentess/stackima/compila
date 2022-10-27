@@ -1,0 +1,1 @@
+f2py -c --f90flags=-O2 -m stackima stackima.f90

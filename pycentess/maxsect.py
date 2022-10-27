@@ -1,0 +1,2 @@
+MAXSECT = 55
+MAXCBV = 27
