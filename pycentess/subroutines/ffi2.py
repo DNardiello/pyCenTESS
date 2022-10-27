@@ -19,6 +19,8 @@ from pycentess.stackima.stackima import radec2dx
 from pycentess.stackima.stackima import radec2dy
 import matplotlib.pyplot as plt
 from matplotlib import cm, colors
+from matplotlib import container
+import matplotlib
 
 
 def writedatafits(pix, namefile, wcs):
@@ -119,6 +121,8 @@ def wmean(x,w):
 
 
 def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
+    matplotlib.rcParams['legend.handlelength'] = 0
+    matplotlib.rcParams['legend.numpoints'] = 1
 
     cam, ccd, xraw, yraw, sect = where_is_the_star(ratar, dectar, minSec, maxSec)
 
@@ -262,13 +266,14 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
     plt.scatter(xnei,ynei,s=9*(22-tnei),color='black')
     plt.xlim([+60,-60])
     plt.ylim([-60,+60])
-    if (len(xcen)<2):
-        plt.errorbar(xcen,ycen,xerr=sxcen,yerr=sycen, fmt='x',color='red',label='SECTOR {0}'.format(sect[0]))
-        plt.xlabel("$\Delta \\alpha$* [arcsec]", size=24)
-        plt.ylabel("$\Delta \delta$ [arcsec]", size=24)
-        plt.legend(loc="best", fontsize=19)
+#    if (len(xcen)<2):
+#        plt.errorbar(xcen,ycen,xerr=sxcen,yerr=sycen, fmt='x',color='red',elinewidth=1.0, capsize=3,
+#                     label='SECTOR {0}'.format(sect[0]))
+#        plt.xlabel("$\Delta \\alpha$* [arcsec]", size=24)
+#        plt.ylabel("$\Delta \delta$ [arcsec]", size=24)
+#        plt.legend(loc="best", fontsize=19)
 
-    if (len(xcen)>1):
+    if (len(xcen)>0):
         usector = np.unique(sect)
         nsectors = len(usector)
         l = np.linspace(0.1, 0.9, endpoint=True, num=nsectors)
@@ -282,9 +287,22 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
             sxx = sxcen[sel] 
             syy = sycen[sel] 
             color = newcolors[i_s]
-            plt.errorbar(xx,yy, xerr=sxx, yerr=syy, color=color, marker='x', ecolor=color, 
-                         elinewidth=0.5, capsize=1, label='SECTOR {0}'.format(ss))
-            plt.legend(loc="best", fontsize=19)
+            plt.errorbar(xx,yy, xerr=sxx, yerr=syy, color=color, marker='D', ecolor=color, 
+                         elinewidth=1.0, capsize=3, label='SECTOR {0}'.format(ss))
+
+            ax = plt.gca()
+            handles, labels = ax.get_legend_handles_labels()
+            new_handles = []
+            for h in handles:
+            #only need to edit the errorbar legend entries
+                if isinstance(h, container.ErrorbarContainer):
+                    new_handles.append(h[0])
+                else:
+                    new_handles.append(h)
+
+            ax.legend(new_handles, labels,numpoints=1,fontsize=19,loc='best')
+
+            #plt.legend(loc="best", fontsize=19)
 
         plt.xlabel("$\Delta \\alpha$* [arcsec]", size=24)
         plt.ylabel("$\Delta \delta$ [arcsec]", size=24)
