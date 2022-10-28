@@ -182,11 +182,11 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
         print('In sector {0} there are {1} transits'.format(sect[ls],ntr))
 
         NUMTRANSIT = ntr
-        ima_in = np.zeros((2*npoints+3,31,31))
-        ima_out = np.zeros((2*npoints+3,31,31))
-        q_in = np.zeros(2*npoints+3)
+        ima_in = np.zeros((2*npoints+13,31,31))
+        ima_out = np.zeros((2*npoints+13,31,31))
+        q_in = np.zeros(2*npoints+13)
         q_in[:] = 99
-        q_out = np.zeros(2*npoints+3)
+        q_out = np.zeros(2*npoints+13)
         q_out[:] = 99
         #print(2*npoints+3)
 
@@ -247,11 +247,19 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
         #wy = 1/sdyf**2
         #xcen[ls], sxcen[ls] = wmean(dxf,wx)
         #ycen[ls], sycen[ls] = wmean(dyf,wy)
+        
+        ok = np.logical_and(abs(dxf)<900, abs(dyf)<900)
+        for it in range(10):
+            #wx = 1/sdxf**2
+            #wy = 1/sdyf**2
+            #xcen[ls], sxcen[ls] = wmean(dxf[ok],wx[ok])
+            #ycen[ls], sycen[ls] = wmean(dyf[ok],wy[ok])
+            xcen[ls] = np.mean(dxf[ok])
+            ycen[ls] = np.mean(dyf[ok])
+            sxcen[ls] = np.std(dxf[ok])
+            sycen[ls] = np.std(dyf[ok])
+            ok = np.logical_and(abs(dxf-xcen[ls])<3*sxcen[ls], abs(dyf-ycen[ls])<3*sycen[ls])
 
-        xcen[ls] = np.mean(dxf)
-        ycen[ls] = np.mean(dyf)
-        sxcen[ls] = np.std(dxf)
-        sycen[ls] = np.std(dyf)
     
     ranei, decnei, tnei =  neighbors(rat[0],det[0])
     xnei = np.zeros(len(ranei))
@@ -264,8 +272,8 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
 
     fig = plt.figure(figsize=(12, 12))
     plt.scatter(xnei,ynei,s=9*(22-tnei),color='black')
-    plt.xlim([+60,-60])
-    plt.ylim([-60,+60])
+    plt.xlim([+120,-120])
+    plt.ylim([-120,+120])
 #    if (len(xcen)<2):
 #        plt.errorbar(xcen,ycen,xerr=sxcen,yerr=sycen, fmt='x',color='red',elinewidth=1.0, capsize=3,
 #                     label='SECTOR {0}'.format(sect[0]))
@@ -300,7 +308,7 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
                 else:
                     new_handles.append(h)
 
-            ax.legend(new_handles, labels,numpoints=1,fontsize=19,loc='best')
+            ax.legend(new_handles, labels,numpoints=1,fontsize=19,loc='upper left')
 
             #plt.legend(loc="best", fontsize=19)
 
