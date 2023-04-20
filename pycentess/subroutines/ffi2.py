@@ -289,6 +289,9 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
     ynei = ynei*3600
 
     fig = plt.figure(figsize=(12, 12))
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=16)
+
     plt.scatter(xnei,ynei,s=9*(22-tnei),color='black')
     plt.xlim([+120,-120])
     plt.ylim([-120,+120])
