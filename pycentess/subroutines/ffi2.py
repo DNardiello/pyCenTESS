@@ -179,7 +179,9 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
                 npoints = int(dur/2/cadence)
                 for k in range(i-2*npoints-1,i+2*npoints+1):
                     transit[k] = ntr
-        print('In sector {0} there are {1} transits'.format(sect[ls],ntr))
+        if (ntr>1): print('In sector {0} there are {1} transits'.format(sect[ls],ntr))
+        if (ntr==1): print('In sector {0} there is {1} transit'.format(sect[ls],ntr))
+        if (ntr<1): print('In sector {0} there are no transits')
 
         NUMTRANSIT = ntr
         ima_in = np.zeros((2*npoints+13,31,31))
@@ -241,7 +243,7 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
         sdxf = sdx[ok]
         sdyf = sdy[ok]
         
-        print(dxf,dyf,sdxf,sdyf)
+        #print(dxf,dyf,sdxf,sdyf)
 
         #wx = 1/sdxf**2
         #wy = 1/sdyf**2
@@ -265,7 +267,7 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
             sycen[ls] = np.std(dyf[ok])
             ok = np.logical_and(abs(dxf-xcen[ls])<3*sxcen[ls], abs(dyf-ycen[ls])<3*sycen[ls])
 
-        print(np.sum(ok0))
+        #print(np.sum(ok0))
         if (np.sum(ok0)==1):
             sxcen[ls] = sdxf[0]
             sycen[ls] = sdyf[0]
@@ -311,7 +313,7 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
             sxx = sxcen[sel] 
             syy = sycen[sel] 
             color = newcolors[i_s]
-            print(xx,yy,sxx,syy)
+            print('In sector {0} the mean in-/out-of-transit centroid is ( {1} +/-{2} , {3} +/- {4}) arcsec'.format(ss,xx[0],sxx[0],yy[0],syy[0]))
             plt.errorbar(xx,yy, xerr=sxx, yerr=syy, color=color, marker='D', ecolor=color, 
                          elinewidth=1.0, capsize=3, label='SECTOR {0}'.format(ss))
 
