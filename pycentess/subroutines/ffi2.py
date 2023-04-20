@@ -221,7 +221,7 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
                 pixsin = stackima(pix=ima_in, flag=q_in)
                 pixsout = stackima(pix=ima_out, flag=q_out)
                 pixdiff = pixsout - pixsin
-                #filename = 'DIFF{0}.{1}.fits'.format(nt,sect[ls])
+                filename = 'DIFF{0}.{1}.fits'.format(nt,sect[ls])
                 #writedatafits(pixdiff, filename, wcs)
                 #filename = 'IN{0}.{1}.fits'.format(nt,sect[ls])
                 #writedatafits(pixsin, filename, wcs)
@@ -241,15 +241,20 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
         sdxf = sdx[ok]
         sdyf = sdy[ok]
         
-        #print(dxf,dyf,sdxf,sdyf)
+        print(dxf,dyf,sdxf,sdyf)
 
         #wx = 1/sdxf**2
         #wy = 1/sdyf**2
         #xcen[ls], sxcen[ls] = wmean(dxf,wx)
         #ycen[ls], sycen[ls] = wmean(dyf,wy)
         
-        ok = np.logical_and(abs(dxf)<900, abs(dyf)<900)
-        for it in range(10):
+        ok0 = np.logical_and(abs(dxf)<900, abs(dyf)<900)
+        NUMIT = 10
+        if (np.sum(ok0)<5):
+            NUMIT = 1
+
+        ok = ok0
+        for it in range(NUMIT):
             #wx = 1/sdxf**2
             #wy = 1/sdyf**2
             #xcen[ls], sxcen[ls] = wmean(dxf[ok],wx[ok])
@@ -260,7 +265,18 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
             sycen[ls] = np.std(dyf[ok])
             ok = np.logical_and(abs(dxf-xcen[ls])<3*sxcen[ls], abs(dyf-ycen[ls])<3*sycen[ls])
 
-    
+        print(np.sum(ok0))
+        if (np.sum(ok0)==1):
+            sxcen[ls] = sdxf[0]
+            sycen[ls] = sdyf[0]
+            xcen[ls] = dxf[0]
+            ycen[ls] = dyf[0]
+        if (np.sum(ok0)==2):
+            sxcen[ls] = np.sqrt(sdxf[0]**2+sdxf[1]**2)/2.
+            sycen[ls] = np.sqrt(sdyf[0]**2+sdyf[1]**2)/2.
+            xcen[ls] = (dxf[0]+dxf[1])/2.
+            ycen[ls] = (dyf[0]+dyf[1])/2.
+
     ranei, decnei, tnei =  neighbors(rat[0],det[0])
     xnei = np.zeros(len(ranei))
     ynei = np.zeros(len(decnei))
@@ -295,6 +311,7 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
             sxx = sxcen[sel] 
             syy = sycen[sel] 
             color = newcolors[i_s]
+            print(xx,yy,sxx,syy)
             plt.errorbar(xx,yy, xerr=sxx, yerr=syy, color=color, marker='D', ecolor=color, 
                          elinewidth=1.0, capsize=3, label='SECTOR {0}'.format(ss))
 
