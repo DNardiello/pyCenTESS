@@ -178,7 +178,12 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
                 ntr = ntr + 1
                 npoints = int(dur/2/cadence)
                 for k in range(i-2*npoints-1,i+2*npoints+1):
-                    transit[k] = ntr
+                    try:
+                        transit[k] = ntr
+                    except IndexError:
+                        k = len(btjd)-1
+                        transit[k] = ntr
+
         if (ntr>1): print('In sector {0} there are {1} transits'.format(sect[ls],ntr))
         if (ntr==1): print('In sector {0} there is {1} transit'.format(sect[ls],ntr))
         if (ntr<1): print('In sector {0} there are no transits')
@@ -223,7 +228,7 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
                 pixsin = stackima(pix=ima_in, flag=q_in)
                 pixsout = stackima(pix=ima_out, flag=q_out)
                 pixdiff = pixsout - pixsin
-                filename = 'DIFF{0}.{1}.fits'.format(nt,sect[ls])
+                #filename = 'DIFF{0}.{1}.fits'.format(nt,sect[ls])
                 #writedatafits(pixdiff, filename, wcs)
                 #filename = 'IN{0}.{1}.fits'.format(nt,sect[ls])
                 #writedatafits(pixsin, filename, wcs)
@@ -237,13 +242,15 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
                 sdx[nt] = sxc*21
                 sdy[nt] = syc*21
                 #print(dx[nt]*3600,dy[nt]*3600, sdx[nt], sdy[nt])
+#        ok = np.logical_and(sdx>0,sdy>0)
+#        ok = dx<30
         ok = np.logical_and(dx>-900,dy>-900)
         dxf = dx[ok]*3600
         dyf = dy[ok]*3600
         sdxf = sdx[ok]
         sdyf = sdy[ok]
         
-        #print(dxf,dyf,sdxf,sdyf)
+        print(dxf,dyf,sdxf,sdyf)
 
         #wx = 1/sdxf**2
         #wy = 1/sdyf**2
@@ -295,7 +302,7 @@ def stack(ratar,dectar,period,t0,dur,minSec, maxSec):
     plt.scatter(xnei,ynei,s=9*(22-tnei),color='black')
     plt.xlim([+120,-120])
     plt.ylim([-120,+120])
-#    if (len(xcen)<2):
+#    if (len(xcen)<1000):
 #        plt.errorbar(xcen,ycen,xerr=sxcen,yerr=sycen, fmt='x',color='red',elinewidth=1.0, capsize=3,
 #                     label='SECTOR {0}'.format(sect[0]))
 #        plt.xlabel("$\Delta \\alpha$* [arcsec]", size=24)
